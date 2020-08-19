@@ -80,6 +80,22 @@ def create_indicium(credentials: dict, rate: dict) -> dict:
     return indicium
 
 
+def save_customs_form(url: str) -> None:
+    """Creates a pdf file from image url
+
+    :param url: path to image
+    """
+    from PIL import Image
+    import requests
+    from io import BytesIO
+
+    response = requests.get(url)
+    img = Image.open(BytesIO(response.content))
+    rgb = Image.new('RGB', img.size, (255, 255, 255))  # white background
+    rgb.paste(img, mask=img.split()[3])  # paste using alpha channel as mask
+    rgb.save("../customs_form.pdf", 'PDF', resoultion=100.0)
+
+
 def main():
     rate = get_rate(credentials=Credentials)
 
@@ -89,7 +105,8 @@ def main():
     )
 
     print(indicium)
-    print(indicium["URL"])
+    save_customs_form(url=indicium["URL"])
+
 
 if __name__ == "__main__":
     main()
